@@ -1,0 +1,66 @@
+#! /home/makoto/anaconda2/bin/python
+
+## OBJECTIVE 5 - REALTIME STREAMING
+## THIS PROGRAM BUILDS OFF OF OBJ 4
+## BY STREAMING FROM ARDUINO
+
+import numpy as np
+from matplotlib import use
+use('Qt4Agg')
+import matplotlib.pyplot as plt
+import scipy.signal as sig
+from time import time, sleep
+from helper import add_data
+import serial
+
+print('NOTE: (Graph time) = (Samples read)*(Arduino rate)')
+max_time = float(raw_input('What should be the max time value during sampling(in milliseconds)?   '))
+data_rate = float(raw_input('How many samples would you like to read per time?   '))
+loop_rate = float(raw_input('How long does it ideally take to sample this many (in milliseconds)?  '))
+
+plt.ion()
+fig, ax = plt.subplots()
+ax.set_xlim(0,max_time/1000)
+ax.set_ylim(-0.0001,0.0001)
+ax.set_title('Plotted Arduino Samples')
+ax.set_ylabel('Voltage Read')
+ax.set_xlabel('Time (s)')
+ampdata = np.array([])
+tdata = np.array([])
+line, = ax.plot(tdata,ampdata)
+fig.canvas.draw()
+
+fil_data = ('init', None)  # Initialize state variable list for use
+box = sig.boxcar(50)
+
+datain = serial.Serial('/dev/ttyACM0', 115200, timeout = 4)
+datain.setDTR(False)
+sleep(0.01)
+datain.reset_input_buffer()
+datain.setDTR(True)
+
+try:
+    while(True):
+        last = time()
+        vals = add_data((tdata,ampdata), data_rate, datain, filterdat = True, f_del = fil_data, serialsource = True)
+        tdata = vals[0]
+        ampdata = vals[1]
+        fil_data = vals[2]
+
+        if(tdata.size > max_time*(data_rate/loop_rate)+100):
+            where = int(tdata.size - max_time*(data_rate/loop_rate) - 100)
+            ampdata, tdata = (np.delete(ampdata, range(0,where)), np.delete(tdata, range(0,where)))
+            ax.set_xlim(tdata.min()+0.5,tdata.min()+max_time/1000+0.5)
+        else:
+            ax.set_xlim(0.5,max_time/1000+0.5)
+        
+        line.set_ydata(sig.lfilter(box,1,ampdata)/50)    ## But this takes time, and should be shortened...
+        line.set_xdata(tdata)
+        ax.draw_artist(ax.xaxis)
+        ax.draw_artist(ax.patch)
+        ax.draw_artist(line)
+        fig.canvas.update()
+        fig.canvas.flush_events()
+        print(time() - last)
+except KeyboardInterrupt:
+    datain.close()
