@@ -38,11 +38,16 @@ class Mapper(object):
     
     sock.connect((IPADDR, PORTNUM)) # connect socket to server
 
+	'''
+	Purpose: This is method is called by signal filtering script to map the EMG
+	values to position in the Pong video game and to send the respective UDP
+	packet to the Pong server.
+	'''
 	@staticmethod
 	def changePosition(leftVal, rightVal, time):
 
 		# determine movement vector from input values
-		if (leftVal > ANALOG_VAL_THRESHOLD && rightVal > \
+		if (leftVal > ANALOG_VAL_THRESHOLD and rightVal > \
 				ANALOG_VAL_THRESHOLD):
 	        vector = 0
 		elif (leftVal > ANALOG_VAL_THRESHOLD):
