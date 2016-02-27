@@ -8,8 +8,8 @@ sending a UDP packet corresponding to position to the paddle position
 
 class Mapper(object):
     
-    IP_ADDR = '127.0.0.1'
-    PORTNUM = 0
+    IP_ADDR = '127.0.0.1' # IP Address to send UDP packet
+    PORTNUM = 0 # Socket endpoint, where to communicate 
 
     ANALOG_VAL_THRESHOLD = 0.00002  # threshold for determining muscle flexion
     DELTA = .001    # amuont by which we update position with each
