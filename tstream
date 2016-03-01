@@ -1,4 +1,4 @@
-#! /PATH/TO/PYTHON
+#! /home/makoto/anaconda2/bin/python
 
 import numpy
 import matplotlib.pyplot as plt
@@ -20,8 +20,8 @@ box = scipy.signal.boxcar(50)                                        # Implement
 plt.ion()                                                            # Enable interactive plotting
 fig, ax = plt.subplots(2, 1, sharex = True)                          # Initialize subplots
 for axes in ax:
-    axes.set_xlim(0, max_time/1000)
-    axes.set_ylim(-0.0001,0.0001)
+    axes.set_xlim(0.25, max_time/1000+0.25)
+    axes.set_ylim(-0.0004,0.0004)
     axes.set_ylabel('Voltage Read (V)')
     line.append(axes.plot(tdata, ampdata0)[0])
 ax[1].set_xlabel('Time (s)')
@@ -36,9 +36,9 @@ datflag = True                                                       # Wait unti
 
 while(True):
 ## WITH HI/LO FILTERING
-    (tdata, ampdata, fil_data) = add_data((tdata, ampdata[0], ampdata[1]), data_rate, datain, f_del = fil_data, dchk = datflag)
+#    (tdata, ampdata, fil_data) = add_data((tdata, ampdata[0], ampdata[1]), data_rate, datain, f_del = fil_data, dchk = datflag)
 ## W/O HI/LO FILTERING
-#    tdata, ampdata = add_data((tdata, ampdata[0], ampdata[1]), data_rate, datain, dchk = datflag)
+    tdata, ampdata = add_data((tdata, ampdata[0], ampdata[1]), data_rate, datain, dchk = datflag)
 
     if datflag:                                                     # Remove initial data check
         datflag = False
@@ -49,9 +49,6 @@ while(True):
         ampdata = (ampdata0, ampdata1)
         for axes in ax:
             axes.set_xlim(tdata.min()+0.25, tdata.max())
-    else:
-        for axes in ax:
-            axes.set_xlim(0.25,max_time/1000+0.25)
 
     for i,lines in enumerate(line):                                 # Plot Updating/Smoothing Routine
         lines.set_ydata(scipy.signal.lfilter(box, 1, ampdata[i])/50)
