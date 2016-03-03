@@ -1,13 +1,18 @@
 volatile int sig0 = 0;
 volatile int sig1 = 0;
-volatile unsigned long currtime = 0.0;
+volatile int stat = 0;
 boolean newread = 0;
+bool state = 0;
 int preloader = 64286;
 
 void setup()
 {
   Serial.begin(115200);
-  Serial.print('s');
+
+  if(analogRead(A2)<512)
+    state = 0;            // Currently in calibration
+  else
+    state = 1;            // Currently in game mode
 
   // initialize timer1 
   cli();           // disable all interrupts
@@ -24,15 +29,17 @@ ISR(TIMER1_OVF_vect)
   TCNT1 = preloader;            // preload timer
   sig0 = analogRead(A0);
   sig1 = analogRead(A1);
-  currtime = micros();
+  stat = analogRead(A2);
   newread = 1; // indicate a new sample has been read
 }
 
 void loop()
 {
   if (newread) { // print to Serial if there is a new sample
-    Serial.print(currtime);
-    Serial.print(" ");
+    if(state==0 && stat > 512) {        // If in calibration, allow exit
+      Serial.print('s');
+      state = 1;
+    }
     Serial.print(sig0);
     Serial.print(" ");
     Serial.print(sig1);
