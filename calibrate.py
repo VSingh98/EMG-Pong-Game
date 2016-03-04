@@ -1,5 +1,6 @@
 import serial
 import change_mode
+import mapping
 
 # declare global variables used for signal processing
 b_low, a_low = scipy.signal.butter(3, .5, 'low', analog=False)
@@ -60,6 +61,8 @@ def write(leftArm, rightArm):
 
 	with rfile as open("rnorm", 'w'):
 		rfile.write(rightArm.amax())
+	
+	Mapper.init()
 
 '''
 This scales an ADC_sampleValue into an EMG voltage
