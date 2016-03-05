@@ -9,10 +9,14 @@ void setup()
 {
   Serial.begin(115200);
 
-  if(analogRead(A2)<512)
+  if(analogRead(A2)<512) {
     state = 0;            // Currently in calibration
-  else
+    Serial.print('c');
+  }
+  else {
     state = 1;            // Currently in game mode
+    Serial.print('s');
+  }
 
   // initialize timer1 
   cli();           // disable all interrupts
