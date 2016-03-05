@@ -1,30 +1,31 @@
-#! /PATH/TO/PYTHON
 import serial
-import change_mode
+import gameloops
+from change_mode import *
 
-ser = serial.Serial('/dev/ttyACM0', 115200, timeout = 4) 
+ser = serial.Serial('/dev/ttyACM1', 115200, timeout = 4)
 ser.setDTR(False)
 ser.setDTR(True)
 
-with ser:
-    while True:
-        try:
-            if ser.read() == 'c':
+while True:            # Need to filter out initial trash
+    mode = ser.read()
+    if mode.isalpha():
+        break
 
-                try:
-					calibrate(ser)		
+while True:
+    try:
+        if mode is 'c':
+            try:
+                gameloops.calibrate(ser)   ## Or feel free to use your function!
                 
-                except ChangeMode:
-                    pass
+            except ChangeMode:
+                pass
+            
+        else:
+            try:
+                gameloops.game_loop(ser)
 
-            else:
-                
-                try:
-                   # call game metohd
-                   pass
-               
-                except ChangeMode:
-                    pass 
-
-		except KeyboardInterrupt:
-			break;
+            except:
+                raise
+    except KeyboardInterrupt:
+        print 'Cancelling program'
+        break
