@@ -43,7 +43,7 @@ void loop()
     if(state==0 && stat > 512) {        // If in calibration, allow exit
       Serial.print('s');
       state = 1;
-    }
+    }  
     Serial.print(sig0);
     Serial.print(" ");
     Serial.print(sig1);

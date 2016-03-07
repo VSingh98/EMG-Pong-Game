@@ -2,7 +2,7 @@ import serial
 import gameloops
 from change_mode import *
 
-ser = serial.Serial('/dev/ttyACM1', 115200, timeout = 4)
+ser = serial.Serial('/dev/ttyACM0', 115200, timeout = 4)
 ser.setDTR(False)
 ser.setDTR(True)
 
@@ -18,7 +18,7 @@ while True:
                 gameloops.calibrate(ser)   ## Or feel free to use your function!
                 
             except ChangeMode:
-                pass
+                mode = 's'
             
         else:
             try:

@@ -39,9 +39,9 @@ class Mapper(object):
     @staticmethod
     def init():
         if op.isfile('lnorm'):
-            Mapper.LEFT_NORMALIZATION_FACTOR = 6.0/7*float(open("lnorm", 'r').readline())
+            Mapper.LEFT_NORMALIZATION_FACTOR = 4.0/7*float(open("lnorm", 'r').readline())
         if op.isfile('rnorm'):
-            Mapper.RIGHT_NORMALIZATION_FACTOR = 6.0/7*float(open('rnorm','r').readline())
+            Mapper.RIGHT_NORMALIZATION_FACTOR = 4.0/7*float(open('rnorm','r').readline())
 
         Mapper.LEFT_THRES = Mapper.LEFT_NORMALIZATION_FACTOR/6.0
         Mapper.RIGHT_THRES = Mapper.RIGHT_NORMALIZATION_FACTOR/6.0

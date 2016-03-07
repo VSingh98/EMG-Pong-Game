@@ -1,6 +1,8 @@
 import serial
-import change_mode
-import mapping
+import numpy as np
+import scipy.signal
+from change_mode import *
+from mapping import *
 
 # declare global variables used for signal processing
 b_low, a_low = scipy.signal.butter(3, .5, 'low', analog=False)
@@ -24,20 +26,27 @@ def calibrate(ser):
 			if len(lines) == 0:
 				continue
 
-			if lines[0] == 's'		# if ilne starts with s, we are no longer in
-				raise ChangeMode 	# calibration mode
+			#if lines[0] != 'c':		# if ilne starts with s, we are no longer in
+			#	raise ChangeMode 	# calibration mode
 			
 			values = lines.split(' ')
+                        if len(values) != 2:
+                                continue
 
-			if values[0].isalpha():
+			if values[0][0] is 'c':
 				values[0] = values[0][1:]
+                        else:
+                                raise ChangeMode
 
 			leftArm.append(int(values[0]))
 			rightArm.append(int(values[1]))
 		
-		except ValueError:
+		except ChangeMode:
 			write(leftArm, rightArm)
-			raise ChangeMode('we are officially in game mode')		
+			raise ChangeMode('we are officially in game mode')
+
+                except ValueError:
+                        pass
 
 		except KeyboardInterrupt:
 			write(leftArm, rightArm)
@@ -54,13 +63,14 @@ def write(leftArm, rightArm):
 
 	leftArm, rightArm = ( scaleToEmg(leftArm), scaleToEmg(rightArm) )
 
+        print leftArm
 	leftArm, rightArm = ( powerSmooth(leftArm), powerSmooth(rightArm) )
 	
-	with lfile as open("lnorm", 'w'):
-		lfile.write(leftArm.amax())
+	with open('lnorm', 'w') as lfile:
+		lfile.write(str(leftArm.max()))
 
-	with rfile as open("rnorm", 'w'):
-		rfile.write(rightArm.amax())
+	with open('rnorm', 'w') as rfile:
+		rfile.write(str(rightArm.max()))
 	
 	Mapper.init()
 
@@ -73,10 +83,11 @@ def scaleToEmg(ADC_sampleValue):
 '''
 This performs filtering, rectifying, and smoothing on the paramter
 '''
-def powerSmooth(data)
+def powerSmooth(data):
 	LowPassData = scipy.signal.lfilter(b_low, a_low, data)
 	filteredData = scipy.signal.lfilter(b_high, a_high, LowPassData)
 	rectifiedData = np.absolute(filteredData)
+        #print rectifiedData
 	smoothData = scipy.signal.lfilter(box, 1, rectifiedData)
 
 	return smoothData
