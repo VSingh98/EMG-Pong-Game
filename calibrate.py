@@ -30,7 +30,7 @@ def calibrate(ser):
 			values = lines.split(' ')
 
 			if values[0].isalpha():
-				values = values[1:]
+				values[0] = values[0][1:]
 
 			leftArm.append(int(values[0]))
 			rightArm.append(int(values[1]))
