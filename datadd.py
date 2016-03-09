@@ -34,12 +34,17 @@ def add_data(dataout, amount_to_add, sourcefile, **args):
                     pass
             temp_a.append((f_value[0]*0.0049-1.5)/3600)
             temp_a2.append((f_value[1]*0.0049-1.5)/3600)
+            
+            ''' FOR DEBUG PURPOSES ONLY '''
+#            temp_a.append(f_value[0]+1)
+#            temp_a2.append(f_value[1]+1)
+
     else:                                                          # READ FROM FILE
         for vals in range(0,int(amount_to_add)):
             lines = sourcefile.readline()
-            f_value = [float(values) for values in lines.split(' ')]
+            f_value = [float(values) for values in lines.strip('\n').split(' ')]
             temp_a.append((f_value[0]*0.0049-1.5)/3600)
-            temp_a2.append((f_value[0]*0.0049-1.5)/3600)
+            temp_a2.append((f_value[1]*0.0049-1.5)/3600)
     temp_a = numpy.array(temp_a)
     temp_a2 = numpy.array(temp_a2)
     if 'f_del' in args:                                            # FILTERING ROUTINE

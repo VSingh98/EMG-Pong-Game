@@ -12,12 +12,12 @@ class Mapper(object):
     IP_ADDR = '127.0.0.1' # IP Address to send UDP packet
     PORTNUM = 5005 # Socket endpoint, where to communicate
 
-    DELTA = .001    # amuont by which we update position with each
+    DELTA = .01    # amuont by which we update position with each
                     # changePosition call
 
     MIDDLE = 0.5    # Middle position in game
     AXIS_SCALAR = 1    # Scalar by which to multiply normalized limits to send
-                        # in UDP packet to game
+                       # in UDP packet to game
 
     position = MIDDLE   # we initialize position to the middle
 
@@ -33,18 +33,21 @@ class Mapper(object):
     LEFT_THRES = 0  # threshold for determining muscle flexion
     RIGHT_THRES = 0
 
+    NORM_RATIO = 6.0/7.0
+    THRES_RATIO = 3.0/10.0 
+
     '''
     to initialize the normalization factors
     '''
     @staticmethod
     def init():
         if op.isfile('lnorm'):
-            Mapper.LEFT_NORMALIZATION_FACTOR = 4.0/7*float(open("lnorm", 'r').readline())
+            Mapper.LEFT_NORMALIZATION_FACTOR = Mapper.NORM_RATIO*float(open("lnorm", 'r').readline())
         if op.isfile('rnorm'):
-            Mapper.RIGHT_NORMALIZATION_FACTOR = 4.0/7*float(open('rnorm','r').readline())
+            Mapper.RIGHT_NORMALIZATION_FACTOR = Mapper.NORM_RATIO*float(open('rnorm','r').readline())
 
-        Mapper.LEFT_THRES = Mapper.LEFT_NORMALIZATION_FACTOR/6.0
-        Mapper.RIGHT_THRES = Mapper.RIGHT_NORMALIZATION_FACTOR/6.0
+        Mapper.LEFT_THRES = Mapper.THRES_RATIO * Mapper.LEFT_NORMALIZATION_FACTOR
+        Mapper.RIGHT_THRES = Mapper.THRES_RATIO * Mapper.RIGHT_NORMALIZATION_FACTOR
     '''
     Purpose: This is method is called by signal filtering script to map the EMG
     values to position in the Pong video game and to send the respective UDP
@@ -52,15 +55,16 @@ class Mapper(object):
     '''
     @staticmethod
     def changePosition(leftVal, rightVal):
+        leftVal = leftVal/Mapper.LEFT_NORMALIZATION_FACTOR
+        rightVal = rightVal/Mapper.RIGHT_NORMALIZATION_FACTOR
+        
+        Mapper.vector = leftVal - rightVal
 
-        if (leftVal < Mapper.LEFT_THRES):
-            leftVal = 0
+        ''' FOR DEBUG PURPOSES ONLY '''
+#        print(str(leftVal)+'\t'+str(rightVal)+'\t'+str(Mapper.vector))
 
-        if (rightVal < Mapper.RIGHT_THRES):
-            rightVal = 0
-
-        Mapper.vector = leftVal/Mapper.LEFT_NORMALIZATION_FACTOR - \
-                        rightVal/Mapper.RIGHT_NORMALIZATION_FACTOR
+	if abs(Mapper.vector) < 0.2:
+            Mapper.vector = 0
 
         Mapper.position = Mapper.position + Mapper.vector * Mapper.DELTA
 
@@ -77,8 +81,8 @@ class Mapper(object):
         if Mapper.position > 1:
             Mapper.position = 1
 
-        elif Mapper.position < -1:
-            Mapper.position = -1
+        elif Mapper.position < 0:
+            Mapper.position = 0
 
         # send str Pong server
         Mapper.sock.sendto( str(Mapper.position * Mapper.AXIS_SCALAR), (Mapper.IP_ADDR, Mapper.PORTNUM) )
