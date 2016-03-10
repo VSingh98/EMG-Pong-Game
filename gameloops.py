@@ -10,6 +10,9 @@ TOREAD = 10       # Amount to read/send per loop
 RATE = 200        # Arduino Read Rate
 SEND_RATE = 100   # Rate to send information at
 SCALE = RATE/SEND_RATE   # Can only be an integer!
+
+DELAY_SCALING_FACTOR = 1.1 # Delay Scaling factor
+
 fil_box = scipy.signal.boxcar(50)  # Type of filtering to implement
 
 def game_loop(serial):
@@ -27,7 +30,7 @@ def game_loop(serial):
         for val in range(0,TOREAD/SCALE):             # Push data to send to mapper (Needs calibration!)
             itertime = time()
             Mapper.changePosition(smoothed[0][-TOREAD+(val*SCALE)], smoothed[1][-TOREAD+(val*SCALE)])
-            sleep((1/SEND_RATE) - (itertime - time()))
+            sleep( DELAY_SCALING_FACTOR * ( (1/SEND_RATE) - (itertime - time()) ) )
 
 def calibrate(serial):
     data = ([],[])
