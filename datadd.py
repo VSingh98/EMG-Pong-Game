@@ -48,7 +48,7 @@ def add_data(dataout, amount_to_add, sourcefile, **args):
     temp_a = numpy.array(temp_a)
     temp_a2 = numpy.array(temp_a2)
     if 'f_del' in args:                                            # FILTERING ROUTINE
-        if args['f_del'][0] == 'init':                             # Init Scheme
+        if str(args['f_del'][0]) == 'init':                             # Init Scheme
             fil_z = [scipy.signal.lfiltic(b_hi,a_hi, numpy.zeros_like(a_hi)), scipy.signal.lfiltic(b_lo,a_lo, numpy.zeros_like(a_lo)), scipy.signal.lfiltic(b_hi,a_hi,numpy.zeros_like(a_hi)), scipy.signal.lfiltic(b_lo, a_lo,numpy.zeros_like(a_lo))]
             temp_a, fil_z[0] = scipy.signal.lfilter(b_hi, a_hi, temp_a, zi = fil_z[0])
             temp_a, fil_z[1] = scipy.signal.lfilter(b_lo, a_lo, temp_a, zi = fil_z[1])

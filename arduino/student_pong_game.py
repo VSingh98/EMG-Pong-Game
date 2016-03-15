@@ -13,11 +13,11 @@ TEAM1_NAME = 'Team 1'
 TEAM2_NAME = 'Team 2'
 
 # Match-Specific Variables
-SPEED_MULTIPLIER = 1  # default speed; how many pixels the ball is incremented; must be >= 1
+SPEED_MULTIPLIER = 2  # default speed; how many pixels the ball is incremented; must be >= 1
 PADDLE_SPEED_MULTIPLIER = 3  # adds speed, i.e. if 1, then max return speed would be 1+1=2 if hit in center of paddle
 BALL_THICKNESS = 20  # size of one side of the rectangular ball in pixels
 PADDLE_SIZE = 200  # size of paddle in pixels
-COMPUTER_DIFFICULTY = 1  # correlated with how fast the computer paddle moves; higher the faster
+COMPUTER_DIFFICULTY = 5  # correlated with how fast the computer paddle moves; higher the faster
 
 # Game-Specific Variables
 INPUT_RANGE = 1000  # higher the value, the high specificity with y position

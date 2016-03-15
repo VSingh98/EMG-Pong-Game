@@ -6,7 +6,7 @@ from datadd import *
 from mapping import *
 
 MAX_SIZE = 200    # Keep about 1 second of data
-TOREAD = 10       # Amount to read/send per loop
+TOREAD = 4       # Amount to read/send per loop
 RATE = 200        # Arduino Read Rate
 SEND_RATE = 100   # Rate to send information at
 SCALE = RATE/SEND_RATE   # Can only be an integer!
@@ -18,23 +18,29 @@ fil_box = scipy.signal.boxcar(50)  # Type of filtering to implement
 def game_loop(serial):
     data = ([],[])
     fil_dat = ('init', None)
+    print "Begin Game"
     
     while True:
-        (data, fil_dat) = add_data(data, 10, serial, f_del = fil_dat)
+        (data, fil_dat) = add_data(data, TOREAD, serial, f_del = fil_dat)
         
         if data[0].size > MAX_SIZE:              # Delete superfluous data
             data = [arr[-MAX_SIZE:] for arr in data]
 
         smoothed = [scipy.signal.lfilter(fil_box, 1, dat) for dat in data]
-            
-        for val in range(0,TOREAD/SCALE):             # Push data to send to mapper (Needs calibration!)
-            itertime = time()
-            Mapper.changePosition(smoothed[0][-TOREAD+(val*SCALE)], smoothed[1][-TOREAD+(val*SCALE)])
-            sleep( DELAY_SCALING_FACTOR * ( (1/SEND_RATE) - (itertime - time()) ) )
+
+        Mapper.changePosition(smoothed[0][-1], smoothed[1][-1])
+       
+#        for val in range(0,TOREAD/SCALE):             # Push data to send to mapper (Needs calibration!)
+#            itertime = time()
+#            Mapper.changePosition(smoothed[0][-TOREAD+(val*SCALE)], smoothed[1][-TOREAD+(val*SCALE)])
+#            #sleep( DELAY_SCALING_FACTOR * ( (1/SEND_RATE) - (itertime - time()) ) )
+#            sleep(.01)
+#            print time() - itertime
 
 def calibrate(serial):
     data = ([],[])
     fil_dat = ('init', None)
+    print "Begin Calibration"
 
     while True:
         try:

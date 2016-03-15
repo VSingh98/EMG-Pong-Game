@@ -30,11 +30,8 @@ class Mapper(object):
     LEFT_NORMALIZATION_FACTOR = 0
     RIGHT_NORMALIZATION_FACTOR = 0
 
-    LEFT_THRES = 0  # threshold for determining muscle flexion
-    RIGHT_THRES = 0
-
     NORM_RATIO = 6.0/7.0
-    THRES_RATIO = 3.0/10.0 
+    THRES_RATIO = 4.0/10.0 
 
     '''
     to initialize the normalization factors
@@ -46,8 +43,6 @@ class Mapper(object):
         if op.isfile('rnorm'):
             Mapper.RIGHT_NORMALIZATION_FACTOR = Mapper.NORM_RATIO*float(open('rnorm','r').readline())
 
-        Mapper.LEFT_THRES = Mapper.THRES_RATIO * Mapper.LEFT_NORMALIZATION_FACTOR
-        Mapper.RIGHT_THRES = Mapper.THRES_RATIO * Mapper.RIGHT_NORMALIZATION_FACTOR
     '''
     Purpose: This is method is called by signal filtering script to map the EMG
     values to position in the Pong video game and to send the respective UDP
@@ -63,7 +58,7 @@ class Mapper(object):
         ''' FOR DEBUG PURPOSES ONLY '''
 #        print(str(leftVal)+'\t'+str(rightVal)+'\t'+str(Mapper.vector))
 
-	if abs(Mapper.vector) < 0.2:
+	if abs(Mapper.vector) < Mapper.THRES_RATIO:
             Mapper.vector = 0
 
         Mapper.position = Mapper.position + Mapper.vector * Mapper.DELTA

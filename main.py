@@ -22,9 +22,8 @@ while True:
             except ChangeMode:
                 mode = 's'
 
-            ''' UNCOMMENT TO WORK WIHTOUT POTENTIOMETER '''
-           # except KeyboardInterrupt:
-           #     mode = 's'
+            except KeyboardInterrupt:
+                mode = 's'
             
         else:
             try:
